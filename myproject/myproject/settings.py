@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-@c)xy#sl^^nun0#ddab*&r3p68f9#boq0pcsmit7ko^phk5ued
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['skill-bridge-2-rtj4.onrender.com', 'localhost']
+ALLOWED_HOSTS = ['https://skill-bridge-3-gtqs.onrender.com','localhost']
 
 
 # Application definition
