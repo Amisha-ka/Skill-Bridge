@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout | SkillBridge</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #e9f4ff;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .logout-container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .logout-card {
+            background: #ffffff;
+            width: 500px; /* Increased width */
+            padding: 50px; /* More inner spacing */
+            border-radius: 18px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .logout-title {
+            font-size: 24px; /* Larger text */
+            font-weight: 600;
+            color: #1d4f91;
+            margin-bottom: 40px;
+        }
+
+        .btn-cancel,
+        .btn-logout {
+            width: 48%;
+            padding: 14px; /* Larger buttons */
+            font-size: 16px;
+            border-radius: 30px;
+            font-weight: 500;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: #ececec;
+            color: #1d4f91;
+        }
+
+        .btn-cancel:hover {
+            background: #d5d5d5;
+        }
+
+        .btn-logout {
+            background: #1d4f91;
+            color: #ffffff;
+            text-decoration-line: none;
+        }
+
+        .btn-logout:hover {
+            background: #143a6c;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="logout-container">
+        <div class="logout-card">
+<p class="logout-title">{{ request.user.username }}, are you sure you want to logout?</p>
+            <div class="d-flex justify-content-between">
+                <button class="btn-cancel" onclick="history.back()">Cancel</button>
+            <a href="{% url 'logout_user' %}" class="btn-logout">Logout</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+

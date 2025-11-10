@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Find Matches | Skill Bridge</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body{ background:#f8f9fa; font-family:'Poppins',sans-serif; }
+    header{ background:#004aad; color:#fff; padding:15px 40px; display:flex; justify-content:space-between; align-items:center; }
+    .logo{ font-size:1.8rem; font-weight:700; }
+    .nav-links a{ color:#fff; margin-left:25px; text-decoration:none; }
+    .container{ margin-top:50px; max-width:900px; }
+    .match-card{ background:#fff; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.1); padding:25px; margin-bottom:20px; }
+    .btn-connect{ background:#004aad; color:#fff; border:none; border-radius:8px; padding:8px 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Skill Bridge</div>
+    <div class="nav-links">
+      <a href="{% url 'home' %}">Home</a>
+          <a href="{% url 'skills' %}">Skills</a>
+
+ <a href="{% url 'find_matches' %}" style="color: #ffdd00; font-weight:600;">
+      Matches
+    </a>   
+       <a href="{% url 'requests_page' %}">Requests</a>
+
+       <a href="{% url 'review' %}">Reviews</a>
+
+       <a  href="{% url 'job_list' %}">Jobs</a>
+
+            <a href="{% url 'profile' request.user.id %}">Profile</a>
+
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+  </header>
+
+  <div class="container">
+    {% if messages %}
+      <div class="mt-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <h2 class="text-center my-4" style="color:#004aad;">Find Your Perfect Match</h2>
+
+    {% if user_profile %}
+      <div class="match-card mb-4">
+        <h5>Your profile</h5>
+        <p><strong>You Teach:</strong> {{ user_profile.teach_skill|default:"(not set)" }}</p>
+        <p><strong>You Want to Learn:</strong> {{ user_profile.learn_skill|default:"(not set)" }}</p>
+      </div>
+    {% else %}
+      <div class="alert alert-warning">Please set your teach/learn skills in profile.</div>
+    {% endif %}
+
+    {% if matches %}
+      {% for match in matches %}
+        <div class="match-card">
+          <h5>🎯 Match Found!</h5>
+          <p><strong>Matched With:</strong> {{ match.user.username }}</p>
+          <p><strong>{{ match.user.username }} Teaches:</strong> {{ match.teach_skill|default:"(not set)" }}</p>
+          <p><strong>{{ match.user.username }} Wants to Learn:</strong> {{ match.learn_skill|default:"(not set)" }}</p>
+
+          <form class="send-request-form" method="post" action="{% url 'send_request' match.user.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-connect mt-3">Connect & Exchange</button>
+          </form>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-center text-muted">No matches found yet.</p>
+    {% endif %}
+  </div>
+
+  <script>
+    // Get CSRF token from cookie
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    document.querySelectorAll('.send-request-form').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const url = this.action;
+        const csrftoken = getCookie('csrftoken');
+
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin'
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.status === 'ok' || data.status === 'exists' || data.status === undefined) {
+            Swal.fire({
+              icon: data.status === 'exists' ? 'info' : 'success',
+              title: data.message || 'Request sent!',
+              confirmButtonColor: '#004aad'
+            });
+          } else {
+            Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Could not send request' });
+          }
+        })
+        .catch(() => {
+          Swal.fire({ icon: 'error', title: 'Error', text: 'Network or server error' });
+        });
+      });
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
